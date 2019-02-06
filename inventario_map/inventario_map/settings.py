@@ -11,15 +11,18 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import environ
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+env = environ.Env()
+
+READ_DOT_ENV_FILE = env.bool('DJANGO_READ_DOT_ENV_FILE', default=False)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'j_p7@4%%13c-!-jxwp#3s_=(_(rjw0iy_st8_bwmr@g0w9c$5a'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -69,21 +72,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'inventario_map.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'pnsu',
-        'USER': 'rosario',
-        'PASSWORD': 'yanajo',
-        'HOST': 'localhost',
-        'PORT': '3306'
+        'NAME': env('MYSQL_DATABASE', default='pnsu'),
+        'USER': env('MYSQL_USER', default='rosario'),
+        'PASSWORD': env('MYSQL_PASSWORD', default='yanajo'),
+        'HOST': env('MYSQL_HOST', default='localhost'),
+        'PORT': '3306',
+        'OPTIONS': {
+            'init_command': 'SET default_storage_engine=INNODB,'
+                            'character_set_connection=utf8,'
+                            'collation_connection=utf8_unicode_ci',
+            'charset': 'utf8',
+            'use_unicode': True,
+        }
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -103,11 +110,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/2.1/topics/i18n/
-
-LANGUAGE_CODE = 'es-es'
+LANGUAGE_CODE = 'es-PE'
 
 TIME_ZONE = 'America/Lima'
 
@@ -117,9 +120,5 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.1/howto/static-files/
-
 STATIC_URL = '/static/'
-STATIC_ROOT =  os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')

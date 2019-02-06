@@ -1,0 +1,30 @@
+version: '3.3'
+
+services:
+  django:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    depends_on:
+      - mysql
+    volumes:
+      - ./inventario_map:/app
+    env_file:
+      - ./.env
+    ports:
+      - "8000:8000"
+    command: /start.sh
+
+  mysql:
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    build:
+      context: .
+      dockerfile: ./compose/local/mysql/Dockerfile
+    volumes:
+      - mysql_server_data:/var/lib/mysql
+    env_file:
+      - ./.env
+
+volumes:
+  mysql_server_data: {}

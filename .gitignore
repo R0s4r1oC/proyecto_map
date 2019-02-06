@@ -5,3 +5,6 @@ myvenv
 db.mysql
 /static
 .DS_Store
+*.sqlite3
+*.old
+.env
