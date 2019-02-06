@@ -11,7 +11,7 @@ from .models import Sedes
 from .models import Tipohardware
 from .models import Moviles
 from .models import Hardware
-
+from .models import Software
 
 admin.site.register(Unidad)
 admin.site.register(Categoria)
@@ -24,6 +24,7 @@ admin.site.register(Sedes)
 admin.site.register(Tipohardware)
 admin.site.register(Moviles)
 admin.site.register(Hardware)
+admin.site.register(Software)
 
 
 @admin.register(Contrato)

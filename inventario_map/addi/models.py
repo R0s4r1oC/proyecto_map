@@ -145,3 +145,13 @@ class Hardware(models.Model):
     def __str__(self):
         return self.cod_patrimonio
 
+
+class Software(models.Model):
+    serial = models.CharField(max_length=50)
+    nombre = models.CharField(max_length=50)
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
+    Ordencompra = models.ForeignKey(Ordencompra, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.cod_patrimonio
