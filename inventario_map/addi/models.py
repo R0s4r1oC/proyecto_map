@@ -1,6 +1,4 @@
-# Create your models here.
 from django.db import models
-from django.utils import timezone
 
 
 class Contrato(models.Model):
@@ -41,10 +39,6 @@ class Usuario(models.Model):
     email = models.CharField(max_length=100)
     anexo = models.CharField(max_length=50)
 
-    def publish(self):
-        self.published_date = timezone.now()
-        self.save()
-
     def __str__(self):
         return self.nombre
 
@@ -52,42 +46,34 @@ class Usuario(models.Model):
 class Proveedor(models.Model):
     ruc = models.IntegerField(primary_key=True)
     nombre = models.CharField(max_length=100)
-    direccion = models.CharField(max_length=100)
-    telefono = models.IntegerField()
+    direccion = models.TextField(blank=True)
+    telefono = models.CharField(max_length=11, blank=True)
 
     def __str__(self):
         return self.nombre
 
 
-class Ordenservicio(models.Model):
+class OrdenServicio(models.Model):
     id_orden = models.IntegerField(primary_key=True)
     fecha_adquisicion = models.DateTimeField(auto_now=True)
     provedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE)
     concepto = models.CharField(max_length=200)
     cod_pedido = models.IntegerField()
-    Unidad_medida = models.CharField(max_length=50)
+    unidad_medida = models.CharField(max_length=50)
     valor_total = models.IntegerField()
-
-    def publish(self):
-        self.published_date = timezone.now()
-        self.save()
 
     def __str__(self):
         return self.provedor
 
 
-class Ordencompra(models.Model):
+class OrdenCompra(models.Model):
     id_orden = models.IntegerField(primary_key=True)
     fecha_compra = models.DateTimeField(auto_now=True)
     proveedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE)
     concepto = models.CharField(max_length=100)
     cod_pedido = models.IntegerField()
-    Unidad_medida = models.CharField(max_length=50)
+    unidad_medida = models.CharField(max_length=50)
     valor_total = models.IntegerField()
-
-    def publish(self):
-        self.published_date = timezone.now()
-        self.save()
 
     def __str__(self):
         return self.proveedor
@@ -104,7 +90,7 @@ class Sedes(models.Model):
         return self.denominacion
 
 
-class Tipohardware(models.Model):
+class TipoHardware(models.Model):
     tipo_hardware = models.CharField(max_length=50)
 
     def __str__(self):
@@ -119,28 +105,20 @@ class Moviles(models.Model):
     imei = models.CharField(max_length=16)
     fecha_asignacion = models.DateTimeField(auto_now=True)
 
-    def publish(self):
-        self.published_date = timezone.now()
-        self.save()
-
     def __str__(self):
         return self.usuario
 
 
 class Hardware(models.Model):
     cod_patrimonio = models.IntegerField()
-    tipo_hardware = models.ForeignKey(Tipohardware, on_delete=models.CASCADE)
+    tipo_hardware = models.ForeignKey(TipoHardware, on_delete=models.CASCADE)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     modelo = models.CharField(max_length=100)
     marca = models.CharField(max_length=100)
     fecha_garantia = models.DateTimeField(auto_now=True)
     serie = models.CharField(max_length=100)
-    orden_compra = models.ForeignKey(Ordencompra, on_delete=models.CASCADE)
-    sede = models.ForeignKey(Sedes,on_delete=models.CASCADE)
-
-    def publish(self):
-        self.published_date = timezone.now()
-        self.save()
+    orden_compra = models.ForeignKey(OrdenCompra, on_delete=models.CASCADE)
+    sede = models.ForeignKey(Sedes, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.cod_patrimonio
@@ -150,7 +128,7 @@ class Software(models.Model):
     serial = models.CharField(max_length=50)
     nombre = models.CharField(max_length=50)
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
-    Ordencompra = models.ForeignKey(Ordencompra, on_delete=models.CASCADE)
+    Ordencompra = models.ForeignKey(OrdenCompra, on_delete=models.CASCADE)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
 
     def __str__(self):
