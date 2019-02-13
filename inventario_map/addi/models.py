@@ -31,11 +31,11 @@ class Area(models.Model):
 
 
 class Usuario(models.Model):
-    dni_id = models.IntegerField(primary_key=True)
-    nombre = models.CharField(max_length=50)
     tipo_contrato = models.ForeignKey(Contrato, on_delete=models.CASCADE)
-    fecha_cese = models.DateTimeField(auto_now=True)
     area = models.ForeignKey(Area, on_delete=models.CASCADE)
+    dni = models.CharField(primary_key=True, max_length=8, db_index=True)
+    nombre = models.CharField(max_length=50)
+    fecha_cese = models.DateTimeField(auto_now=True)
     email = models.CharField(max_length=100)
     anexo = models.CharField(max_length=50)
 
