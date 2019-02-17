@@ -22,9 +22,11 @@ services:
       context: .
       dockerfile: ./compose/local/mysql/Dockerfile
     volumes:
-      - mysql_server_data:/var/lib/mysql
+      - pnsu_app_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
     env_file:
       - ./.env
 
 volumes:
-  mysql_server_data: {}
+  pnsu_app_data: {}

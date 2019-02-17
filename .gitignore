@@ -8,3 +8,6 @@ db.mysql
 *.sqlite3
 *.old
 .env
+.directory
+.vscode
+.idea

@@ -1,3 +1,8 @@
 django
 django-environ
 mysqlclient
+django-model-utils
+django-crispy-forms
+djangorestframework
+-e git+https://github.com/django-import-export/django-import-export.git#egg=django-import-export
+-e git+https://github.com/izimobil/django-rest-framework-datatables.git#egg=djangorestframework-datatables

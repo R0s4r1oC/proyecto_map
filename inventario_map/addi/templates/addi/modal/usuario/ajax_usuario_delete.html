@@ -1,0 +1,17 @@
+{% if object %}
+¿Esta seguro que desea eliminar el siguiente usuario?
+<ul>
+    <li>{{ object.nombres_apelldos }}</li>
+</ul>
+{% elif object_list %}
+<form method="POST" id="id-usuarioForm">
+    {% csrf_token %}
+    <ul>
+        {% for object in object_list %}
+        <li><input type="hidden" name="pks" value="{{ object.pk }}"/>{{ object.nombres_apelldos }}</li>
+        {% endfor %}
+    </ul>
+</form>
+{% else %}
+<p>No ha seleccionado ningun usuario.</p>
+{% endif %}

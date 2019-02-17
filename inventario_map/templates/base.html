@@ -21,63 +21,38 @@
     <link href="{% static 'vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css' %}" rel="stylesheet">
+    {% block css %}{% endblock %}
     <!-- Custom Theme Style -->
     <link href="{% static 'build/css/custom.min.css' %}" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-    <script type="text/javascript">
-      $(document).ready(function(){
-      	// Activate tooltip
-      	$('[data-toggle="tooltip"]').tooltip();
-      	// Select/Deselect checkboxes
-      	var checkbox = $('table tbody input[type="checkbox"]');
-      	$("#selectAll").click(function(){
-      		if(this.checked){
-      			checkbox.each(function(){
-      				this.checked = true;
-      			});
-      		} else{
-      			checkbox.each(function(){
-      				this.checked = false;
-      			});
-      		}
-      	});
-      	checkbox.click(function(){
-      		if(!this.checked){
-      			$("#selectAll").prop("checked", false);
-      		}
-      	});
-      });
-    </script>
   </head>
   <body class="nav-md">
     <div class="container body">
       <div class="main_container">
         {% include 'header.html' %}
-        <div class="right_col" id="filtro" role="main">
-          <div class="page-title">
-            <div class="title_left">
-              <h3>{% block app_title %}{% endblock %}</h3>
-            </div>
-            <div class="title_right">
-              <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
-                <div class="input-group">
-                  <input type="text" class="form-control" placeholder="Buscar...">
-                  <span class="input-group-btn">
-                    <button class="btn btn-default" type="button">Go!</button>
-                  </span>
+        <div class="right_col" role="main">
+          <div class="">
+            <div class="page-title">
+              <div class="title_left">
+                {% block app_title %}{% endblock %}
+              </div>
+              <div class="title_right">
+                <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+                  <div class="input-group">
+                    <input id="txtBuscar" type="text" class="form-control" placeholder="Buscar...">
+                    <span class="input-group-btn">
+                      <button class="btn btn-default" type="button"><i class="fa fa-search"></i></button>
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
+            <div class="clearfix"></div>
+            <div class="">
+              {% block content %}{% endblock content %}
+            </div>
+            <div class="clearfix"></div>
           </div>
-          <div class="container">
-            {% block content %}{% endblock content %}
-          </div>
+          <div class="clearfix"></div>
         </div>
         {% include 'footer.html' %}
       </div>
@@ -86,6 +61,7 @@
   <script src="{% static 'vendors/bootstrap/dist/js/bootstrap.min.js' %}"></script>
   <script src="{% static 'vendors/fastclick/lib/fastclick.js' %}"></script>
   <script src="{% static 'vendors/nprogress/nprogress.js' %}"></script>
+  <script src="{% static 'vendors/bootstrap-progressbar/bootstrap-progressbar.min.js' %}"></script>
   <script src="{% static 'vendors/iCheck/icheck.min.js' %}"></script>
   <script src="{% static 'vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
   <script src="{% static 'vendors/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
@@ -103,6 +79,8 @@
   <script src="{% static 'vendors/pdfmake/build/pdfmake.min.js' %}"></script>
   <script src="{% static 'vendors/pdfmake/build/vfs_fonts.js' %}"></script>
   <!-- Custom Theme Scripts -->
-  <script src="{% static 'build/js/custom.min.js' %}"></script>
+  <!----script src="{% static 'build/js/custom.min.js' %}"></script-->
+  <script src="{% static 'build/js/custom.js' %}"></script>
+  {% block javascript %}{% endblock %}
 </body>
 </html>
