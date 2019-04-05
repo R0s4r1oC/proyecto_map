@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block app_title %}<h3>{{ app_title }}</h3>{% endblock %}
+{% block css %}
+<link href="{% static 'vendors/pnotify/dist/pnotify.css' %}" rel="stylesheet">
+<link href="{% static 'vendors/pnotify/dist/pnotify.buttons.css' %}" rel="stylesheet">
+<link href="{% static 'vendors/pnotify/dist/pnotify.nonblock.css' %}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+<div class="col-md-12 col-sm-12 col-xs-12">
+  <div class="x_panel">
+    <div class="x_title">
+      <h2><i class="fa fa-bars"></i> Listado de Usuarios <small></small></h2>
+      <ul class="nav navbar-right panel_toolbox">
+        <li>
+          <a id='triggerAdd' href="#formEmployeeModal" class="text-success" data-toggle="modal" title="Añadir usuario nuevo"><i class="fa fa-plus-square"></i></a>
+        </li>
+        <li>
+          <a id='triggerDel' href="#formEmployeeModal" class="text-danger" data-toggle="modal" title="Remover usuarios"><i class="fa fa-minus-square"></i><span></a>
+        </li>
+      </ul>
+      <div class="clearfix"></div>
+    </div>
+    <div class="x_content">
+      <div class="table-wrapper">
+        <div class="table-title">
+          <div class="row">
+            <div class="col-sm-6"></div>
+          </div>
+        </div>
+        <table id="tableUsuarios" class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>
+                <span class="custom-checkbox">
+                  <input type="checkbox" id="selectAll">
+                  <label for="selectAll"></label>
+                </span>
+              </th>
+              <th>DNI</th>
+              <th>NOMBRE</th>
+              <th>TIPO DE CONTRATO</th>
+              <th>AREA</th>
+              <th>EMAIL</th>
+              <th>ANEXO</th>
+              <th></th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% include 'addi/modal/usuario/usuario_form.html' %}
+{% endblock content%}
+{% block javascript %}
+<script src="{% static 'vendors/pnotify/dist/pnotify.js' %}"></script>
+<script src="{% static 'vendors/pnotify/dist/pnotify.buttons.js' %}"></script>
+<script src="{% static 'vendors/pnotify/dist/pnotify.nonblock.js' %}"></script>
+<script>
+  var registrarUsuarioURL = '';
+  var deleteUsuarioURL = '';
+  var tbUsuarios = $('#tableUsuarios').DataTable({
+    "initComplete": function(settings, json) {
+      var checkbox = $('table input[type="checkbox"]');
+      $("#selectAll").click(function(){
+        if(this.checked){
+          checkbox.each(function(){
+            this.checked = true;
+          });
+        } else{
+          checkbox.each(function(){
+            this.checked = false;
+          });
+        }
+      });
+      checkbox.click(function(){
+        if(!this.checked){
+          $("#selectAll").prop("checked", false);
+        }
+      });
+    },
+    "lengthChange": false,
+    "aoColumnDefs": [{
+      'bSortable': false,
+      'aTargets': [0, 4, 5, 6, 7]
+    }],
+    dom: "rtip",
+    pageLength: 50,
+    "serverSide": true,
+    "ajax": "{% url 'addi:usuario-api-list' %}?format=datatables",
+    "columns": [
+      {
+        "data": "dni",
+        "searchable": false,
+        "createdCell": function (td, cellData, rowData, row, col) {
+          var checkbox = '<input type="checkbox" name="pks" value="'+cellData+'"/>';
+          $(td).html(checkbox);
+        }
+      },
+      {"data": "dni"},
+      {"data": "nombres_apelldos"},
+      {"data": "tipo_contrato_label"},
+      {"data": "area_label"},
+      {"data": "email"},
+      {"data": "anexo"},
+      {
+        "data": "dni",
+        "sortable": false,
+        "createdCell": function (td, cellData, rowData, row, col) {
+          var edit_button = '<button class="btn btn-info btn-xs btn-edit" href="#formEmployeeModal" data-toggle="modal" data-value="'+cellData+'">Editar</button>';
+          var delete_button = '<button class="btn btn-danger btn-xs btn-del" href="#formEmployeeModal" data-toggle="modal" data-value="'+cellData+'">Eliminar</button>';
+          $(td).html(edit_button+delete_button);
+        }
+      }
+    ]
+  });
+  function registrarUsuario (e) {
+    var data = $('#id-usuarioForm').serialize();
+    $.post('{% url "addi:usuario-create" %}', data, function(html, statusText, jqXHR) {
+      $('#formEmployeeModal').find('.modal-body').html(html);
+      tbUsuarios.ajax.reload();
+      new PNotify({
+        title: 'Usuario Registrado',
+        text: 'El usuario fue registrado exitosamente',
+        type: 'success',
+        styling: 'bootstrap3'
+      });
+    }).fail(function(response, statusText, jqXHR) {
+      $('#formEmployeeModal').find('.modal-body').html(response.responseText);
+      new PNotify({
+        title: 'Ocurrio un Error',
+        text: 'Se produjo un eror al registrar el usuario.',
+        type: 'error',
+        styling: 'bootstrap3'
+      });
+    });
+  }
+  function actualizarUsuario (e) {
+    var data = $('#id-usuarioForm').serialize();
+    delete data.dni;
+    $.post(registrarUsuarioURL, data, function(html, statusText, jqXHR) {
+      $('#formEmployeeModal').find('.modal-body').html(html);
+      tbUsuarios.ajax.reload();
+      new PNotify({
+        title: 'Usuario Actualizado',
+        text: 'El usuario fue actualizado exitosamente',
+        type: 'success',
+        styling: 'bootstrap3'
+      });
+    }).fail(function(response, statusText, jqXHR) {
+      $('#formEmployeeModal').find('.modal-body').html(response.responseText);
+      document.getElementById('id_dni').readOnly = true;
+      new PNotify({
+        title: 'Ocurrio un Error',
+        text: 'Se produjo un eror al actualizar el usuario.',
+        type: 'error',
+        styling: 'bootstrap3'
+      });
+    });
+  }
+  function eliminarUsuario (e) {
+    var data = {csrfmiddlewaretoken: jQuery("[name=csrfmiddlewaretoken]").val()};
+    $.post(deleteUsuarioURL, data, function(html, statusText, jqXHR) {
+      tbUsuarios.ajax.reload();
+      new PNotify({
+        title: 'Usuario Eliminado',
+        text: 'El usuario fue eliminado exitosamente',
+        type: 'success',
+        styling: 'bootstrap3'
+      });
+    }).fail(function(response, statusText, jqXHR) {
+      new PNotify({
+        title: 'Ocurrio un Error',
+        text: 'Se produjo un eror al eliminar el usuario.',
+        type: 'error',
+        styling: 'bootstrap3'
+      });
+    });
+  }
+  function eliminarUsuarios (e) {
+    var data = $('#id-usuarioForm').serialize();
+    $.post('{% url "addi:usuarios-delete" %}', data, function(html, statusText, jqXHR) {
+      tbUsuarios.ajax.reload();
+      new PNotify({
+        title: 'Usuarios Eliminados',
+        text: 'Los usuario fueron eliminados exitosamente',
+        type: 'success',
+        styling: 'bootstrap3'
+      });
+    }).fail(function(response, statusText, jqXHR) {
+      new PNotify({
+        title: 'Ocurrio un Error',
+        text: 'Se produjo un eror al eliminar los usuarios.',
+        type: 'error',
+        styling: 'bootstrap3'
+      });
+    });
+  }
+  function Usuario() {
+    this.openUsuarioModal = function (e) {
+      var modal = $(this);
+      var triggerer = e.relatedTarget;
+      if (triggerer.id === 'triggerAdd') {
+        modal.find('.modal-title').text('Registro de usuario');
+        $('#btnEnviarUsuario').unbind('click').click(registrarUsuario);
+        $('#btnEnviarUsuario').html('Registar');
+        $.get('{% url "addi:usuario-create" %}', function(html) {
+          modal.find('.modal-body').html(html);
+          document.getElementById("id_dni").focus();
+        });
+      } else if (triggerer.id === 'triggerDel') {
+        var data = $("table tbody input:checked").serialize();
+        var pks = [];
+        $.get('{% url "addi:usuarios-delete" %}', data, function(html) {
+          modal.find('.modal-title').text('¿Desea eliminar los usuarios?');
+          $('#btnEnviarUsuario').unbind('click').click(eliminarUsuarios);
+          $('#btnEnviarUsuario').html('Eliminar');
+          modal.find('.modal-body').html(html);
+        });
+      } else if (triggerer.className.includes('btn-edit')) {
+        modal.find('.modal-title').text('Actualización de usuario');
+        var id = e.relatedTarget.getAttribute('data-value');
+        registrarUsuarioURL = '/usuarios/'+id+'/update/';
+        $('#btnEnviarUsuario').unbind('click').click(actualizarUsuario);
+        $('#btnEnviarUsuario').html('Actualizar');
+        $.get(registrarUsuarioURL, function(html) {
+          modal.find('.modal-body').html(html);
+          document.getElementById('id_dni').readOnly = true;
+          document.getElementById("id_nombre").focus();
+        });
+      } else if (triggerer.className.includes('btn-del')) {
+        modal.find('.modal-title').text('Eliminar de usuario');
+        var id = e.relatedTarget.getAttribute('data-value');
+        deleteUsuarioURL = '/usuarios/'+id+'/delete/';
+        $('#btnEnviarUsuario').unbind('click').click(eliminarUsuario);
+        $('#btnEnviarUsuario').html('Eliminar');
+        $.get(deleteUsuarioURL, function(html) {
+          modal.find('.modal-body').html(html);
+        });
+      }
+    }
+  }
+  Usuario.prototype.init = function () {
+    $('#formEmployeeModal').on('show.bs.modal', this.openUsuarioModal);
+    $('#txtBuscar').on('keyup', function () {
+      var that = tbUsuarios;
+      if (that.search() !== this.value) {
+        that.search(this.value).draw();
+      }
+    });
+  }
+  usuario = new Usuario();
+  usuario.init();
+</script>
+{% endblock javascript %}

@@ -21,6 +21,6 @@ admin.site.register(Software)
 
 @admin.register(Contrato)
 class ContratoAdmin(admin.ModelAdmin):
-    list_display = ('id', 'nombre')
-    list_filter = ('id', 'nombre')
-    search_field = ('id', 'nombre')
+    list_display = ('titulo', )
+    list_filter = ('titulo', )
+    search_field = ('titulo', )

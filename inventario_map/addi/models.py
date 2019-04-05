@@ -1,28 +1,30 @@
 from django.db import models
 
+from model_utils.models import TimeStampedModel
 
-class Contrato(models.Model):
-    nombre = models.CharField(max_length=50)
+
+class Contrato(TimeStampedModel):
+    titulo = models.CharField(max_length=500)
 
     def __str__(self):
-        return self.nombre
+        return self.titulo
 
 
-class Unidad(models.Model):
+class Unidad(TimeStampedModel):
     unidad = models.CharField(max_length=50)
 
     def __str__(self):
         return self.unidad
 
 
-class Categoria(models.Model):
+class Categoria(TimeStampedModel):
     categoria = models.CharField(max_length=50)
 
     def __str__(self):
         return self.categoria
 
 
-class Area(models.Model):
+class Area(TimeStampedModel):
     nombre = models.CharField(max_length=50)
     unidad = models.ForeignKey(Unidad, on_delete=models.CASCADE)
 
@@ -30,43 +32,57 @@ class Area(models.Model):
         return self.nombre
 
 
-class Usuario(models.Model):
+class Usuario(TimeStampedModel):
     tipo_contrato = models.ForeignKey(Contrato, on_delete=models.CASCADE)
     area = models.ForeignKey(Area, on_delete=models.CASCADE)
-    dni = models.CharField(primary_key=True, max_length=8, db_index=True)
-    nombre = models.CharField(max_length=50)
-    fecha_cese = models.DateTimeField(auto_now=True)
-    email = models.CharField(max_length=100)
+    dni = models.CharField(
+        verbose_name='D.N.I',
+        primary_key=True,
+        max_length=8,
+        db_index=True,
+    )
+    nombre = models.CharField(max_length=150)
+    apellido_paterno = models.CharField(max_length=50)
+    apellido_materno = models.CharField(max_length=50)
+    fecha_cese = models.DateField(blank=True, null=True)
+    email = models.EmailField()
     anexo = models.CharField(max_length=50)
 
+    class Meta:
+        ordering = ('nombre', 'apellido_paterno', 'apellido_materno')
+
     def __str__(self):
-        return self.nombre
+        return self.nombres_apelldos
+
+    @property
+    def nombres_apelldos(self):
+        return f'{self.nombre} {self.apellido_paterno} {self.apellido_materno}'
 
 
-class Proveedor(models.Model):
+class Proveedor(TimeStampedModel):
     ruc = models.IntegerField(primary_key=True)
-    nombre = models.CharField(max_length=100)
-    direccion = models.TextField(blank=True)
+    razon_social = models.CharField('Razón Social', max_length=150)
+    direccion = models.TextField('Dirección', blank=True)
     telefono = models.CharField(max_length=11, blank=True)
 
     def __str__(self):
         return self.nombre
 
 
-class OrdenServicio(models.Model):
-    id_orden = models.IntegerField(primary_key=True)
-    fecha_adquisicion = models.DateTimeField(auto_now=True)
+class OrdenServicio(TimeStampedModel):
     provedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE)
-    concepto = models.CharField(max_length=200)
-    cod_pedido = models.IntegerField()
+    codigo = models.CharField(max_length=10, db_index=True)
+    fecha_adquisicion = models.DateField()
+    concepto = models.TextField()
+    cod_pedido = models.CharField(max_length=10, db_index=True)
     unidad_medida = models.CharField(max_length=50)
-    valor_total = models.IntegerField()
+    valor_total = models.DecimalField(max_digits=9, decimal_places=2)
 
     def __str__(self):
         return self.provedor
 
 
-class OrdenCompra(models.Model):
+class OrdenCompra(TimeStampedModel):
     id_orden = models.IntegerField(primary_key=True)
     fecha_compra = models.DateTimeField(auto_now=True)
     proveedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE)
@@ -79,7 +95,7 @@ class OrdenCompra(models.Model):
         return self.proveedor
 
 
-class Sedes(models.Model):
+class Sedes(TimeStampedModel):
     direccion = models.CharField(max_length=100)
     denominacion = models.CharField(max_length=50)
     provincia = models.CharField(max_length=50)
@@ -90,16 +106,16 @@ class Sedes(models.Model):
         return self.denominacion
 
 
-class TipoHardware(models.Model):
+class TipoHardware(TimeStampedModel):
     tipo_hardware = models.CharField(max_length=50)
 
     def __str__(self):
         return self.tipo_hardware
 
 
-class Moviles(models.Model):
-    numero = models.IntegerField(primary_key=True)
+class Moviles(TimeStampedModel):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    numero = models.IntegerField(primary_key=True)
     marca = models.CharField(max_length=50)
     modelo = models.CharField(max_length=100)
     imei = models.CharField(max_length=16)
@@ -109,7 +125,7 @@ class Moviles(models.Model):
         return self.usuario
 
 
-class Hardware(models.Model):
+class Hardware(TimeStampedModel):
     cod_patrimonio = models.IntegerField()
     tipo_hardware = models.ForeignKey(TipoHardware, on_delete=models.CASCADE)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
@@ -124,12 +140,12 @@ class Hardware(models.Model):
         return self.cod_patrimonio
 
 
-class Software(models.Model):
-    serial = models.CharField(max_length=50)
-    nombre = models.CharField(max_length=50)
+class Software(TimeStampedModel):
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
     Ordencompra = models.ForeignKey(OrdenCompra, on_delete=models.CASCADE)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    serial = models.CharField(max_length=50)
+    nombre = models.CharField(max_length=50)
 
     def __str__(self):
         return self.cod_patrimonio
