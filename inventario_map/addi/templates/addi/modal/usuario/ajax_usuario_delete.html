@@ -1,5 +1,6 @@
 {% if object %}
 ¿Esta seguro que desea eliminar el siguiente usuario?
+{% csrf_token %}
 <ul>
     <li>{{ object.nombres_apelldos }}</li>
 </ul>
